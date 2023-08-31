@@ -57,10 +57,11 @@ const styles = StyleSheet.create({
     Heading: {
         fontSize: 35,
         marginBottom: 20,
+        fontWeight: 'bold'
     },
 
     subHeading: {
-        fontSize: 15,
+        fontSize: 16,
         color: 'white',
         marginBottom: 20
     },

@@ -13,7 +13,7 @@ function Home() {
     const [name, setName] = useState("");
     const [recording, setRecording] = useState('');
     const [recordings, setRecordings] = useState([]);
-    const [recordingFile, setRecordingFile] = useState()
+    // const [recordingFile, setRecordingFile] = useState()
     const [message, setMessage] = useState("");
     const [editingIndex, setEditingIndex] = useState(-1);
     const [isPlaying, setIsPlaying] = useState(false);
@@ -138,7 +138,6 @@ function Home() {
                 setRecordings(updatedRecordings);
                 setRecording(null)
                 setName('')
-                setRecordingFile(updatedRecordings[1].file)
 
             }
         } catch (err) {
@@ -187,24 +186,24 @@ function Home() {
                         <Icon name="play" size={20} color="#E0A96D" />
                     </Pressable>
                     <View style={styles.btnEdit}>
-                    {
-                        editingIndex === index ? (
-                            <View>
-                                <Pressable onPress={() => updateRecording(index)}>
-                                    <Icon name="save" size={20} color="#E0A96D" />
-                                </Pressable>
-                            </View>
-                        ) : (
-                            <View>
-                                <Pressable onPress={() => editRecordingName(index)}>
-                                    <Icon name="edit" size={20} color="#E0A96D" />
-                                </Pressable>
-                            </View>
-                        )
-                    }
+                        {
+                            editingIndex === index ? (
+                                <View>
+                                    <Pressable onPress={() => updateRecording(index)}>
+                                        <Icon name="save" size={20} color="#E0A96D" />
+                                    </Pressable>
+                                </View>
+                            ) : (
+                                <View>
+                                    <Pressable onPress={() => editRecordingName(index)}>
+                                        <Icon name="edit" size={20} color="#E0A96D" />
+                                    </Pressable>
+                                </View>
+                            )
+                        }
                     </View>
-                    
-                     <Pressable style={styles.btnDelete} onPress={() => deleteRecording(index)}>
+
+                    <Pressable style={styles.btnDelete} onPress={() => deleteRecording(index)}>
                         <Icon name="remove" size={20} color="#E0A96D" />
                     </Pressable>
                 </View>
@@ -226,8 +225,8 @@ function Home() {
         try {
 
             // Update the name in Firestore
-            const recordRef = doc(db, 'recordings', record.name );
-            await updateDoc(recordRef, {name: record.newName});
+            const recordRef = doc(db, 'recordings', record.name);
+            await updateDoc(recordRef, { name: record.newName });
 
             // Rename the audio file in Storage
             const oldAudioFileRef = ref(storage, `audio/${record.userId}/${record.name}`);
@@ -246,8 +245,8 @@ function Home() {
             console.log('Rename successful');
 
             return true;
-        }catch(err){
-            console.log("Error renaming audio:",err)
+        } catch (err) {
+            console.log("Error renaming audio:", err)
         }
 
     }
@@ -257,25 +256,22 @@ function Home() {
 
         const recordingToDelete = recordings[index];
 
-        // Delete from Firebase Storage
-        const audioFileRef = ref(storage, `audio/${recordingToDelete.useruid}/${recordingToDelete.name}`);
+        console.log(recordingToDelete.firestoreDocId)
+
         try {
+
+            // Delete from Firestore
+            const recordingDocRef = doc(db, 'recordings', recordingToDelete.firestoreDocId);
+            await deleteDoc(recordingDocRef);
+            console.log('Recording details deleted from Firebase');
+
+            //  Delete from Firebase Storage
+            const audioFileRef = ref(storage, `audio/${user.uid}/${recordingToDelete.name}`);
             await deleteObject(audioFileRef);
-            alert('Recording deleted from storage');
+            console.log('Recording deleted from storage');
+
         } catch (err) {
             console.log(err);
-        }
-
-        // Delete from Firestore
-        const firestoreDocId = recordingToDelete.firestoreDocId;
-        if (firestoreDocId) {
-            const docRef = doc(db, 'recordings', firestoreDocId);
-            try {
-                await deleteDoc(docRef);
-                alert('Recording details deleted from Firebase');
-            } catch (err) {
-                console.log(err)
-            }
         }
 
         // Update the state after deleting
@@ -283,7 +279,7 @@ function Home() {
         setRecordings(updatedRecordings);
     }
 
-    // Loading the recording from AsyncStorage
+    // Loading the recording from Firebase Firestore
     async function loadRecordings() {
         if (user) {
             try {
@@ -315,11 +311,10 @@ function Home() {
         }
     }, [user])
 
-
     return (
         <View style={styles.container}>
             <View style={styles.userInfo} >
-                <Text style={styles.userInfoText}><Icon name="user" size={20} color="#fff" /> : {auth.currentUser?.email}</Text>
+                <Text style={styles.userInfoText}><Icon name="user" size={20} color='#E0A96D' /> : {auth.currentUser?.email}</Text>
                 <Text style={styles.userInfoButton} onPress={handleSignOut}>Log Out</Text>
             </View>
             <View style={styles.headingContainer}>
@@ -370,12 +365,12 @@ const styles = StyleSheet.create({
     },
 
     userInfoText: {
-        color: 'white',
+        color: '#E0A96D',
         margin: 5,
     },
 
     userInfoButton: {
-        color: 'white',
+        color: '#E0A96D',
         marginRight: 10,
     },
 

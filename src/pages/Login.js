@@ -1,6 +1,6 @@
 import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useEffect, useState } from 'react'
-import { Button, Text, View, TextInput, StyleSheet, KeyboardAvoidingView, Pressable } from 'react-native'
+import { Text, View, TextInput, StyleSheet, KeyboardAvoidingView, Pressable } from 'react-native'
 import { auth } from '../../firebaseconfig';
 import { useNavigation } from '@react-navigation/native';
 import { disableErrorHandling } from 'expo';
