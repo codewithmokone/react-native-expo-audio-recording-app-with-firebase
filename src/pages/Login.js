@@ -3,15 +3,13 @@ import React, { useEffect, useState } from 'react'
 import { Text, View, TextInput, StyleSheet, KeyboardAvoidingView, Pressable } from 'react-native'
 import { auth } from '../../firebaseconfig';
 import { useNavigation } from '@react-navigation/native';
-import { disableErrorHandling } from 'expo';
-
 
 function Login() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const navigation = useNavigation();
+  const navigation = useNavigation()
 
   useEffect(() => {
 
@@ -26,19 +24,6 @@ function Login() {
 
     return unsubscribe
   }, [])
-
-  const handleLogin = async () => {
-    try {
-      signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          // Singed in
-          navigation.navigate('Home')
-          const user = userCredential.user;
-        })
-    } catch (err) {
-      console.log(err)
-    }
-  }
 
   const handleNavigate = () => {
     navigation.navigate('Register')

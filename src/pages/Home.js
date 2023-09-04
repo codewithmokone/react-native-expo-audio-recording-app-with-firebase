@@ -220,31 +220,22 @@ function Home() {
     // Handles the update functionality
     async function updateRecording(index) {
 
-        const record = recordings[index];
+        const recording = recordings[index]
 
         try {
-
             // Update the name in Firestore
-            const recordRef = doc(db, 'recordings', record.name);
-            await updateDoc(recordRef, { name: record.newName });
+            const recordRef = doc(db, 'recordings', recording.firestoreDocId);
+            await updateDoc(recordRef, { name: name });
 
-            // Rename the audio file in Storage
-            const oldAudioFileRef = ref(storage, `audio/${record.userId}/${record.name}`);
-            const newAudioFileRef = ref(storage, `audio/${record.userId}/${record.newName}`);
+            const updatedRecordings = recordings.map((recordingItem) => {
+                if (recordingItem.id === recording.firestoreDocId) {
+                    return { ...recordingItem, name: name };
+                }
+                return recordingItem;
+            });
 
-            // Get the download URL of the old audio file
-            const downloadURL = await getDownloadURL(oldAudioFileRef);
-
-            // Delete the old audio file
-            await deleteObject(oldAudioFileRef);
-
-            // Upload the audio file with the new name
-            const response = await fetch(downloadURL);
-            const blob = await response.blob();
-            await uploadBytes(newAudioFileRef, blob);
-            console.log('Rename successful');
-
-            return true;
+            setRecordings(updatedRecordings);
+            console.log('Title updated')
         } catch (err) {
             console.log("Error renaming audio:", err)
         }
