@@ -10,10 +10,16 @@ function Register() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
 
     const navigation = useNavigation();
 
     const handleRegister = async () => {
+
+        if (!name || !email || !password) {
+            return setErrorMessage("All fields are required");
+        }
+
         try {
             createUserWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
@@ -34,7 +40,8 @@ function Register() {
             style={styles.container}
             behavior='padding'
         >
-            <View>
+            <View style={{ alignItems: 'center' }}>
+                {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
             </View>
             <View style={styles.inputSection}>
                 <Text>Name</Text>
@@ -74,7 +81,7 @@ function Register() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#588157',
+        backgroundColor: '#DDC3A5',
         alignItems: 'center',
         justifyContent: 'center'
     },
@@ -106,7 +113,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 20,
-      },
+    },
 
     button: {
         width: 150,
@@ -127,7 +134,9 @@ const styles = StyleSheet.create({
         letterSpacing: 0.25,
         color: '#E0A96D',
     },
-
+    errorText: {
+        color: 'red',
+    }
 });
 
 export default Register

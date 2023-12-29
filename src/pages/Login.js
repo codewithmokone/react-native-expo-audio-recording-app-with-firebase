@@ -1,6 +1,6 @@
 import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useEffect, useState } from 'react'
-import { Text, View, TextInput, StyleSheet, KeyboardAvoidingView, Pressable } from 'react-native'
+import { Text, View, TextInput, StyleSheet, KeyboardAvoidingView, Pressable, Alert } from 'react-native'
 import { auth } from '../../firebaseconfig';
 import { useNavigation } from '@react-navigation/native';
 
@@ -8,10 +8,16 @@ function Login() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const navigation = useNavigation()
 
   const handleLogin = () => {
+
+    if(!email || !password){
+      return setErrorMessage("Email required");
+    }
+
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed in
@@ -22,12 +28,15 @@ function Login() {
         const errorCode = error.code;
         const errorMessage = error.message;
         // Handle sign-in errors here
-        console.error(errorCode, errorMessage);
+        if (errorCode === 'auth/wrong-password') {
+          setErrorMessage('Invalid email/password');
+        } else {
+          setErrorMessage(errorMessage)
+        }
       });
   };
 
   useEffect(() => {
-
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         const uid = user.uid;
@@ -51,21 +60,26 @@ function Login() {
       behavior='padding'
     >
       <View style={styles.inputContainer}>
-        <Text>Email</Text>
-        <TextInput
-          style={styles.input}
-          value={email}
-          placeholder=" Enter your email"
-          onChangeText={text => setEmail(text)}
-        />
-        <Text>Password</Text>
-        <TextInput
-          style={styles.input}
-          value={password}
-          placeholder=" Enter your password"
-          onChangeText={text => setPassword(text)}
-          secureTextEntry
-        />
+        <View style={{alignItems:'center'}}>
+          {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+        </View>
+        <View>
+          <Text>Email</Text>
+          <TextInput
+            style={styles.input}
+            value={email}
+            placeholder=" Enter your email"
+            onChangeText={text => setEmail(text)}
+          />
+          <Text>Password</Text>
+          <TextInput
+            style={styles.input}
+            value={password}
+            placeholder=" Enter your password"
+            onChangeText={text => setPassword(text)}
+            secureTextEntry
+          />
+        </View>
         <View style={styles.btnSection}>
           <Pressable style={styles.button} onPress={() => handleLogin()}>
             <Text style={styles.btnText}>Sign In</Text>
@@ -146,6 +160,9 @@ const styles = StyleSheet.create({
     letterSpacing: 0.25,
     color: '#E0A96D',
   },
+  errorText: {
+    color: 'red',
+  }
 });
 
 export default Login
