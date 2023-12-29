@@ -11,6 +11,21 @@ function Login() {
 
   const navigation = useNavigation()
 
+  const handleLogin = () => {
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+        navigation.navigate('Home');
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // Handle sign-in errors here
+        console.error(errorCode, errorMessage);
+      });
+  };
+
   useEffect(() => {
 
     const unsubscribe = onAuthStateChanged(auth, (user) => {
