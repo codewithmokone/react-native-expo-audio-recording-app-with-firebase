@@ -15,7 +15,7 @@ function Login() {
   const handleLogin = () => {
 
     if(!email || !password){
-      return setErrorMessage("Email required");
+      return setErrorMessage("Email and password required");
     }
 
     signInWithEmailAndPassword(auth, email, password)
